@@ -1,0 +1,23 @@
+body{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+}
+
+.main-page-title {
+  margin: 2rem 0 2rem 0;
+  text-align: center;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+}
+
+.track-canvas {
+  border:2px solid black;
+}
