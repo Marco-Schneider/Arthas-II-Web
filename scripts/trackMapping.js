@@ -92,16 +92,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
       }
       else {
         console.log("This curve is turning left");
-        angle += angle;
         // var endX = initialX + (2*curveRadius)*Math.sin(angle);
         // var endY = initialY + (2*curveRadius)*Math.cos(angle);
         turning = "left";
-      }
-      if(rightDistance > leftDistance) {
-        console.log("This curve is turning left");
-      }
-      else {
-        console.log("This curve is turning right");
       }
     }
     else {
