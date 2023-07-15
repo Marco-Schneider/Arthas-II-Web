@@ -21,3 +21,24 @@ footer {
 .track-canvas {
   border:2px solid black;
 }
+
+.main-information-container {
+  justify-content: center;
+  width: 85vw;
+  margin: auto;
+}
+
+.calculations-container {
+  justify-content: center;
+  display: flex;
+  margin-top: 2rem;
+}
+
+.input-container {
+  background-color: blue;
+  width: 20%;
+}
+
+.track-table {
+  width: 80%;
+}
