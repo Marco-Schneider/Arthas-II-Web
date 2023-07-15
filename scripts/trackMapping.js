@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var angle = section.trackSection - 1 > 0 ? calculatedPositions[section.trackSection - 1].angle : 0;
     var curveRadius = 0;
     var isACurve = false;
+    var turning = "";
 
     //Checking if the section is a straight line or a curve
     if(leftDistance != rightDistance) {
@@ -89,12 +90,14 @@ document.addEventListener("DOMContentLoaded", function(e) {
           console.log("This curve is turning right");
           var endX = initialX + (2*curveRadius)*Math.sin(angle);
           var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          turning = "right";
         }
         else {
           console.log("This curve is turning left");
           angle += angle;
           var endX = initialX + (2*curveRadius)*Math.sin(angle);
           var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          turning = "left";
         }
       }
       else {
@@ -127,7 +130,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       leftEncoderCount: section.leftEncoderCount, 
       rightEncoderCount: section.rightEncoderCount, 
       leftTravelledDistance: leftDistance,
-      rightTravelledDistance: rightDistance
+      rightTravelledDistance: rightDistance,
+      turning: turning
     }
 
     calculatedPositions.push(sectionInformation);
@@ -148,7 +152,13 @@ document.addEventListener("DOMContentLoaded", function(e) {
       console.log("CURVA!!");
       var centerX = (positions.initialX + positions.endX) / 2;
       var centerY = (positions.initialY + positions.endY) / 2;
-      ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, Math.PI / 2, 1.5*Math.PI, true);
+      if(positions.turning = "right") {
+        ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, Math.PI / 2, 1.5*Math.PI, true);
+      }
+      else {
+        ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, Math.PI / 2, 1.5*Math.PI, false);
+      }
+    
       ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
       ctx.stroke();
       console.log("Center: ", centerX, centerY);
