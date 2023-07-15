@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       trackSection: 3 
     },
     { 
-      leftEncoderCount: 1378, 
-      rightEncoderCount: 809, 
+      leftEncoderCount: 809, 
+      rightEncoderCount: 1378, 
       trackSection: 4 
     },
     { 
@@ -84,37 +84,41 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var initialY = section.trackSection == 0 ? y : calculatedPositions[section.trackSection - 1].endY; 
 
     if(isACurve) {
-      if(angle>0 && angle<Math.PI*1.02) {
-        console.log("Between 0 and 180 degrees");
-        if(rightDistance > leftDistance) {
-          console.log("This curve is turning right");
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
-          turning = "right";
-        }
-        else {
-          console.log("This curve is turning left");
-          angle += angle;
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
-          turning = "left";
-        }
+      if(rightDistance > leftDistance) {
+        console.log("This curve is turning right");
+        // var endX = initialX + (2*curveRadius)*Math.sin(angle);
+        // var endY = initialY + (2*curveRadius)*Math.cos(angle);
+        turning = "right";
       }
       else {
-        console.log("Between 180 and 360 degrees");
-        if(rightDistance > leftDistance) {
-          console.log("This curve is turning left");
-        }
-        else {
-          console.log("This curve is turning right");
-        }
+        console.log("This curve is turning left");
+        angle += angle;
+        // var endX = initialX + (2*curveRadius)*Math.sin(angle);
+        // var endY = initialY + (2*curveRadius)*Math.cos(angle);
+        turning = "left";
       }
-      // var endX = initialX + (2*curveRadius)*Math.sin(angle);
-      // var endY = initialY + (2*curveRadius)*Math.cos(angle);
+      if(rightDistance > leftDistance) {
+        console.log("This curve is turning left");
+      }
+      else {
+        console.log("This curve is turning right");
+      }
     }
     else {
       var endX = initialX + sectionLength*Math.cos(angle);
       var endY = initialY + sectionLength*Math.sin(angle);
+    }
+
+    if(turning == "right") {
+      if(angle>0 && angle<Math.PI*1.0002) {
+        console.log("theta = theta + alpha");
+      }
+      else {
+        console.log("theta = theta - alpha");
+      }
+    }
+    else if(turning == "left") {
+
     }
 
     const sectionInformation = {
