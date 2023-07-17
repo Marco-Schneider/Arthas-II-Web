@@ -2,7 +2,6 @@
   Handles the received information from the esp32 and draws the
   track on the given canvas element on the page
 */
-
 $(document).ready(function() {
 
   canvas = document.getElementById("track");
@@ -14,6 +13,8 @@ $(document).ready(function() {
   getTrackSectionInfo();
 
   drawTrack();
+
+  drawTable();
 
 });
 
@@ -187,4 +188,22 @@ function drawTrack() {
   ctx.lineTo(trackSectionInformation[0].initialX * scaleFactor, trackSectionInformation[0].initialY * scaleFactor);
   ctx.strokeStyle = `hsl(${(trackSectionInformation[0].section * 60) % 360}, 100%, 50%)`;
   ctx.stroke();
+}
+
+function drawTable() {
+  for(const section of trackSectionInformation) {
+    var newRow = $("<tr>");
+    var columns = "";
+    columns += `<th scope="row">${section.section}</th>`;
+    columns += `<td>${section.isACurve == true ? "curve" : "straight"}</td>`;
+    columns += `<td>${section.isACurve == true ? "VL and theta" : "MAX"}</td>`;
+    columns += `<td>${section.isACurve == true ? "VL and theta" : "0"}</td>`;
+    columns += `<td>${section.rightEncoderCount}</td>`;
+    columns += `<td>${section.leftEncoderCount}</td>`;
+    columns += `<td>${section.rightTravelledDistance.toFixed(2)}</td>`;
+    columns += `<td>${section.leftTravelledDistance.toFixed(2)}</td>`;
+    columns += `<td>${section.travelledDistance.toFixed(2)}</td>`;
+    newRow.append(columns);
+    $("table.table.table-striped.table-dark").append(newRow);
+  }
 }
