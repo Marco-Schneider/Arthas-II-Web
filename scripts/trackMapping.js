@@ -156,12 +156,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
       console.log("CURVA!!");
       var centerX = (positions.initialX + positions.endX) / 2;
       var centerY = (positions.initialY + positions.endY) / 2;
-      var angleIncrement = ((positions.endAngle - positions.initialAngle) / 25.0);
-      if(positions.turning = "right") {
+      var angleIncrement = ((positions.endAngle - positions.initialAngle) / 50.0);
 
+      ctx.save(); // Save the current context state
+
+      // Translate the canvas origin to the center of the curve
+      ctx.translate(centerX*scaleFactor, centerY*scaleFactor);
+  
+
+      if(positions.turning = "right") {
         for(let angle = positions.initialAngle; angle <= positions.endAngle; angle += angleIncrement) {
-          x = centerX + positions.radius * Math.cos(angle);
-          y = centerY + positions.radius * Math.sin(angle);
+          x = positions.radius * Math.sin(angle);
+          y = positions.radius * Math.cos(angle);
 
           if(angle == initialAngle) {
             ctx.moveTo(x*scaleFactor, y*scaleFactor);
@@ -172,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
           ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
           ctx.stroke();
         }
+        ctx.restore()
 
       }
       else {
