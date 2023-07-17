@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       trackSection: 3 
     },
     { 
-      leftEncoderCount: 1378, 
-      rightEncoderCount: 809, 
+      leftEncoderCount: 809, 
+      rightEncoderCount: 1378, 
       trackSection: 4 
     },
     { 
@@ -87,19 +87,19 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var initialY = section.trackSection == 0 ? y : calculatedPositions[section.trackSection - 1].endY; 
 
     if(isACurve) {
-      if(endAngle>0 && endAngle<Math.PI*1.02) {
+      if(angle>0 && angle<Math.PI*1.02) {
         console.log("Between 0 and 180 degrees");
         if(rightDistance > leftDistance) {
           console.log("This curve is turning right");
-          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
-          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
+          var endX = initialX + (2*curveRadius)*Math.sin(angle);
+          var endY = initialY + (2*curveRadius)*Math.cos(angle);
           turning = "right";
         }
         else {
           console.log("This curve is turning left");
-          endAngle += endAngle;
-          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
-          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
+          angle += angle;
+          var endX = initialX + (2*curveRadius)*Math.sin(angle);
+          var endY = initialY + (2*curveRadius)*Math.cos(angle);
           turning = "left";
         }
       }
@@ -118,6 +118,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
     else {
       var endX = initialX + sectionLength*Math.cos(endAngle);
       var endY = initialY + sectionLength*Math.sin(endAngle);
+    }
+
+    if(turning == "right") {
+      if(angle>0 && angle<Math.PI*1.0002) {
+        console.log("theta = theta + alpha");
+      }
+      else {
+        console.log("theta = theta - alpha");
+      }
+    }
+    else if(turning == "left") {
+
     }
 
     const sectionInformation = {
@@ -158,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
       var centerY = (positions.initialY + positions.endY) / 2;
       var angleIncrement = ((positions.endAngle - positions.initialAngle) / 50.0);
 
-      ctx.save(); // Save the current context state
+      ctx.save(); // Save the current context stateWWW
 
       // Translate the canvas origin to the center of the curve
       ctx.translate(centerX*scaleFactor, centerY*scaleFactor);
