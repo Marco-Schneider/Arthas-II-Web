@@ -85,6 +85,11 @@ const trackData = [
     leftEncoderCount: 361, 
     rightEncoderCount: 77, 
     trackSection: 3 
+  },
+  { 
+    leftEncoderCount: 153, 
+    rightEncoderCount: 772, 
+    trackSection: 4 
   }
 ];
 
@@ -115,7 +120,7 @@ function getTrackSectionInfo() {
     var initialY = section.trackSection == 0 ? y : trackSectionInformation[section.trackSection - 1].endY; 
 
     if(isACurve) {
-      if(endAngle>0 && endAngle<Math.PI*1.02) {
+      if(endAngle>0 && endAngle<Math.PI*1.1) {
         if(rightDistance > leftDistance) {
           turningDirection = "right";
           endAngle = initialAngle + endAngle;
@@ -190,6 +195,10 @@ function drawTrack() {
         var centerX = section.initialX;
         var centerY = section.initialY - section.radius;
       } 
+      else if((Math.abs(section.endAngle - Math.PI) < 0.5) && section.turningDirection == "right") {
+        var centerX = section.initialX;
+        var centerY = section.initialY - section.radius;
+      }
       else if((Math.abs(endAngle - Math.PI/2) > 1) && section.turningDirection == "left") {
         var centerX = section.initialX + section.radius;
         var centerY = section.initialY;
@@ -240,6 +249,7 @@ function drawTrack() {
       }
     }
     else {
+      ctx.restore();
       ctx.moveTo(section.initialX * scaleFactor, section.initialY * scaleFactor);
       ctx.lineTo(section.endX * scaleFactor, section.endY * scaleFactor);
       ctx.strokeStyle = `hsl(${(section.section * 60) % 360}, 100%, 50%)`;
