@@ -5,20 +5,16 @@
 document.addEventListener("DOMContentLoaded", function(e) {
   const canvas = document.getElementById("track");
   const ctx = canvas.getContext('2d');
-
   // ctx.moveTo(0, 0);
   // ctx.lineTo(200, 100);
   // ctx.stroke();
-
   const wheelDiameter = 32;
   const distanceBetweenWheels = 130;
   const scaleFactor = 0.30;
-
   // let x = canvas.width / 2;
   // let y = canvas.height - wheelDiameter*2;
   let x = canvas.width / 2 + 950;
   let y = canvas.height + 500;
-
   const trackData = [
     { 
       leftEncoderCount: 696, 
@@ -41,8 +37,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       trackSection: 3 
     },
     { 
-      leftEncoderCount: 809, 
-      rightEncoderCount: 1378, 
+      leftEncoderCount: 1378, 
+      rightEncoderCount: 809, 
       trackSection: 4 
     },
     { 
@@ -51,9 +47,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
       trackSection: 5 
     }
   ];
-
   const calculatedPositions = [];
-
   for(const section of trackData) {
     const leftDistance = (section.leftEncoderCount / 140) * Math.PI * wheelDiameter;
     const rightDistance = (section.rightEncoderCount / 140) * Math.PI * wheelDiameter;
@@ -62,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var curveRadius = 0;
     var isACurve = false;
     var turning = "";
-
     //Checking if the section is a straight line or a curve
     if(leftDistance != rightDistance) {
       curveRadius = Math.abs((distanceBetweenWheels/2.0)*((rightDistance + leftDistance)/(rightDistance - leftDistance)));
@@ -82,24 +75,23 @@ document.addEventListener("DOMContentLoaded", function(e) {
     console.log("leftDistance ", leftDistance);
     console.log("rightDistance ", rightDistance);
     console.log("sectionLength ", sectionLength);
-
     var initialX = section.trackSection == 0 ? x : calculatedPositions[section.trackSection - 1].endX; 
     var initialY = section.trackSection == 0 ? y : calculatedPositions[section.trackSection - 1].endY; 
 
     if(isACurve) {
-      if(angle>0 && angle<Math.PI*1.02) {
+      if(endAngle>0 && endAngle<Math.PI*1.02) {
         console.log("Between 0 and 180 degrees");
         if(rightDistance > leftDistance) {
           console.log("This curve is turning right");
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
+          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
           turning = "right";
         }
         else {
           console.log("This curve is turning left");
-          angle += angle;
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          endAngle += endAngle;
+          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
+          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
           turning = "left";
         }
       }
@@ -120,18 +112,6 @@ document.addEventListener("DOMContentLoaded", function(e) {
       var endY = initialY + sectionLength*Math.sin(endAngle);
     }
 
-    if(turning == "right") {
-      if(angle>0 && angle<Math.PI*1.0002) {
-        console.log("theta = theta + alpha");
-      }
-      else {
-        console.log("theta = theta - alpha");
-      }
-    }
-    else if(turning == "left") {
-
-    }
-
     const sectionInformation = {
       section: section.trackSection,
       travelledDistance: sectionLength,
@@ -149,17 +129,13 @@ document.addEventListener("DOMContentLoaded", function(e) {
       rightTravelledDistance: rightDistance,
       turning: turning
     }
-
     calculatedPositions.push(sectionInformation);
     console.log("---")
-
     // x += sectionLength * scaleFactor;
     // y = section.trackSection * 50;
-
     // ctx.lineTo(x, y);
     // ctx.stroke();
   }
-
   for(const positions of calculatedPositions) {
     ctx.beginPath();
     ctx.lineWidth = 3;
@@ -168,15 +144,12 @@ document.addEventListener("DOMContentLoaded", function(e) {
       console.log("CURVA!!");
       var centerX = (positions.initialX + positions.endX) / 2;
       var centerY = (positions.initialY + positions.endY) / 2;
-      var angleIncrement = ((positions.endAngle - positions.initialAngle) / 50.0);
-
-      ctx.save(); // Save the current context stateWWW
-
-      // Translate the canvas origin to the center of the curve
-      ctx.translate(centerX*scaleFactor, centerY*scaleFactor);
-  
-
+      var angleIncrement = ((positions.endAngle - positions.initialAngle) / 25.0);
       if(positions.turning = "right") {
+
+        ctx.save();
+        ctx.translate(centerX*scaleFactor, centerY*scaleFactor);
+
         for(let angle = positions.initialAngle; angle <= positions.endAngle; angle += angleIncrement) {
           x = positions.radius * Math.sin(angle);
           y = positions.radius * Math.cos(angle);
@@ -190,7 +163,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
           ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
           ctx.stroke();
         }
-        ctx.restore()
+
+        ctx.restore();
 
       }
       else {
@@ -206,15 +180,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
       ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
       ctx.stroke();
     }
-
   }
-
   console.log("calculatedPositions: ", calculatedPositions);
-
   for(const positions of calculatedPositions) {
     var newRow = $("<tr>");
     var columns = "";
-
     columns += `<th scope="row">${positions.section}</th>`;
     columns += `<td>${positions.isACurve == true ? "curve" : "straight"}</td>`;
     columns += `<td>${positions.isACurve == true ? "VL and theta" : "MAX"}</td>`;
@@ -224,10 +194,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
     columns += `<td>${positions.rightTravelledDistance.toFixed(2)}</td>`;
     columns += `<td>${positions.leftTravelledDistance.toFixed(2)}</td>`;
     columns += `<td>${positions.travelledDistance.toFixed(2)}</td>`;
-
     newRow.append(columns);
     $("table.table.table-striped.table-dark").append(newRow);
   }
-
   // ctx.stroke();
 });
