@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     const leftDistance = (section.leftEncoderCount / 140) * Math.PI * wheelDiameter;
     const rightDistance = (section.rightEncoderCount / 140) * Math.PI * wheelDiameter;
     const sectionLength = (leftDistance + rightDistance) / 2;
-    var angle = section.trackSection - 1 > 0 ? calculatedPositions[section.trackSection - 1].angle : 0;
+    var initialAngle = section.trackSection - 1 > 0 ? calculatedPositions[section.trackSection - 1].endAngle : 0;
     var curveRadius = 0;
     var isACurve = false;
     var turning = "";
@@ -72,8 +72,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
         Considering that we have a curve radius and the section length we can determine
         how much of the circuference was travelled and thus retrieve an angle
       */
-      angle = sectionLength / curveRadius;
-      console.log("angle: ", angle);
+      endAngle = sectionLength / curveRadius;
+      console.log("angle: ", endAngle);
+    }
+    else {
+      endAngle = initialAngle;
     }
 
     console.log("leftDistance ", leftDistance);
@@ -84,19 +87,19 @@ document.addEventListener("DOMContentLoaded", function(e) {
     var initialY = section.trackSection == 0 ? y : calculatedPositions[section.trackSection - 1].endY; 
 
     if(isACurve) {
-      if(angle>0 && angle<Math.PI*1.02) {
+      if(endAngle>0 && endAngle<Math.PI*1.02) {
         console.log("Between 0 and 180 degrees");
         if(rightDistance > leftDistance) {
           console.log("This curve is turning right");
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
+          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
           turning = "right";
         }
         else {
           console.log("This curve is turning left");
-          angle += angle;
-          var endX = initialX + (2*curveRadius)*Math.sin(angle);
-          var endY = initialY + (2*curveRadius)*Math.cos(angle);
+          endAngle += endAngle;
+          var endX = initialX + (2*curveRadius)*Math.sin(endAngle);
+          var endY = initialY + (2*curveRadius)*Math.cos(endAngle);
           turning = "left";
         }
       }
@@ -113,8 +116,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       // var endY = initialY + (2*curveRadius)*Math.cos(angle);
     }
     else {
-      var endX = initialX + sectionLength*Math.cos(angle);
-      var endY = initialY + sectionLength*Math.sin(angle);
+      var endX = initialX + sectionLength*Math.cos(endAngle);
+      var endY = initialY + sectionLength*Math.sin(endAngle);
     }
 
     const sectionInformation = {
@@ -122,7 +125,8 @@ document.addEventListener("DOMContentLoaded", function(e) {
       travelledDistance: sectionLength,
       isACurve: isACurve,
       radius: curveRadius,
-      angle: angle,
+      initialAngle: initialAngle,
+      endAngle: endAngle,
       initialX: initialX,
       initialY: initialY,
       endX: endX,
@@ -152,15 +156,28 @@ document.addEventListener("DOMContentLoaded", function(e) {
       console.log("CURVA!!");
       var centerX = (positions.initialX + positions.endX) / 2;
       var centerY = (positions.initialY + positions.endY) / 2;
+      var angleIncrement = ((positions.endAngle - positions.initialAngle) / 25.0);
       if(positions.turning = "right") {
-        ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, Math.PI / 2, 1.5*Math.PI, true);
+
+        for(let angle = positions.initialAngle; angle <= positions.endAngle; angle += angleIncrement) {
+          x = centerX + positions.radius * Math.cos(angle);
+          y = centerY + positions.radius * Math.sin(angle);
+
+          if(angle == initialAngle) {
+            ctx.moveTo(x*scaleFactor, y*scaleFactor);
+          } else {
+            ctx.lineTo(x*scaleFactor, y*scaleFactor);
+          }
+
+          ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
+          ctx.stroke();
+        }
+
       }
       else {
-        ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, Math.PI / 2, 1.5*Math.PI, false);
+        // ctx.arc(centerX * scaleFactor, centerY * scaleFactor, positions.radius * scaleFactor, positions.initialAngle, positions.endAngle, false);
       }
-    
-      ctx.strokeStyle = `hsl(${(positions.section * 60) % 360}, 100%, 50%)`;
-      ctx.stroke();
+
       console.log("Center: ", centerX, centerY);
     }
     else {
