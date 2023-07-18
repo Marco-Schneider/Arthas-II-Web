@@ -88,8 +88,38 @@ const trackData = [
   },
   { 
     leftEncoderCount: 153, 
-    rightEncoderCount: 772, 
+    rightEncoderCount: 722, 
     trackSection: 4 
+  },
+  { 
+    leftEncoderCount: 70, 
+    rightEncoderCount: 70, 
+    trackSection: 5 
+  },
+  { 
+    leftEncoderCount: 361, 
+    rightEncoderCount: 77, 
+    trackSection: 6 
+  },
+  { 
+    leftEncoderCount: 70, 
+    rightEncoderCount: 70, 
+    trackSection: 7 
+  },
+  { 
+    leftEncoderCount: 153, 
+    rightEncoderCount: 722, 
+    trackSection: 8 
+  },
+  { 
+    leftEncoderCount: 348, 
+    rightEncoderCount: 348, 
+    trackSection: 9 
+  },
+  { 
+    leftEncoderCount: 722, 
+    rightEncoderCount: 153, 
+    trackSection: 10 
   }
 ];
 
@@ -129,8 +159,8 @@ function getTrackSectionInfo() {
             endY = endX > endY ? initialY - curveRadius : initialY + curveRadius;
           } 
           else {
-            endX = initialX + curveRadius * Math.sin(endAngle);
-            endY = initialY + curveRadius * Math.cos(endAngle);
+            endX = initialX + 2*curveRadius * Math.sin(endAngle);
+            endY = initialY + 2*curveRadius * Math.cos(endAngle);
           }
         }
         else {
@@ -139,6 +169,10 @@ function getTrackSectionInfo() {
           if(Math.abs(endAngle - Math.PI/2) > 1) {
             endX = initialX + curveRadius;
             endY = initialY - curveRadius*Math.cos(endAngle);
+          }
+          else if(Math.abs(endAngle - Math.PI) > 1) {
+            endX = initialX - curveRadius;
+            endY = initialY - curveRadius;
           }
           else {
             endX = initialX + curveRadius*Math.sin(endAngle);
@@ -157,8 +191,18 @@ function getTrackSectionInfo() {
       }
     }
     else {
-      var endX = initialX + sectionLength*Math.cos(endAngle);
-      var endY = initialY + sectionLength*Math.sin(endAngle);
+      if(Math.abs(endAngle - Math.PI/2) < 1) {
+        var endX = initialX + sectionLength*Math.cos(endAngle);
+        var endY = initialY - sectionLength*Math.sin(endAngle);
+      }
+      else if(Math.abs(endAngle - 3*Math.PI/2) < 1) {
+        var endX = initialX + sectionLength*Math.cos(endAngle);
+        var endY = initialY - sectionLength*Math.sin(endAngle);
+      }
+      else {
+        var endX = initialX + sectionLength*Math.cos(endAngle);
+        var endY = initialY + sectionLength*Math.sin(endAngle);
+      }
     }
 
     const sectionInformation = {
@@ -199,9 +243,13 @@ function drawTrack() {
         var centerX = section.initialX;
         var centerY = section.initialY - section.radius;
       }
-      else if((Math.abs(endAngle - Math.PI/2) > 1) && section.turningDirection == "left") {
+      else if((Math.abs(section.endAngle - Math.PI/2) > 1) && section.turningDirection == "left") {
         var centerX = section.initialX + section.radius;
         var centerY = section.initialY;
+      }
+      else if((Math.abs(section.endAngle - Math.PI) > 1) && section.turningDirection == "left") {
+        var centerX = section.initialX;
+        var centerY = section.initialY - section.radius;
       }
       else {
         var centerX = (section.initialX + section.endX) / 2;
@@ -232,20 +280,38 @@ function drawTrack() {
         ctx.save();
         ctx.translate(centerX*scaleFactor, centerY*scaleFactor);
 
-        for(let angle = section.initialAngle; angle >= section.endAngle; angle += angleIncrement) {
-          x = section.radius * Math.sin(angle*-1 - Math.PI/2);
-          y = section.radius * Math.cos(angle*-1 - Math.PI/2);
-
-          if(angle == section.initialAngle) {
-            ctx.moveTo(x*scaleFactor, y*scaleFactor);
-          } else {
-            ctx.lineTo(x*scaleFactor, y*scaleFactor);
+        if(section.initialX > section.endX && section.initialY > section.endY) {
+          for(let angle = section.initialAngle; angle >= section.endAngle; angle += angleIncrement) {
+            x = section.radius * Math.sin(angle - Math.PI);
+            y = section.radius * Math.cos(angle + Math.PI);
+  
+            if(angle == section.initialAngle) {
+              ctx.moveTo(x*scaleFactor, y*scaleFactor);
+            } else {
+              ctx.lineTo(x*scaleFactor, y*scaleFactor);
+            }
+  
+            ctx.strokeStyle = `hsl(${(section.section * 60) % 360}, 100%, 50%)`;
+            ctx.stroke();
           }
-
-          ctx.strokeStyle = `hsl(${(section.section * 60) % 360}, 100%, 50%)`;
-          ctx.stroke();
+          ctx.restore();
         }
-        ctx.restore();
+        else {
+          for(let angle = section.initialAngle; angle >= section.endAngle; angle += angleIncrement) {
+            x = section.radius * Math.sin(angle*-1 - Math.PI/2);
+            y = section.radius * Math.cos(angle*-1 - Math.PI/2);
+  
+            if(angle == section.initialAngle) {
+              ctx.moveTo(x*scaleFactor, y*scaleFactor);
+            } else {
+              ctx.lineTo(x*scaleFactor, y*scaleFactor);
+            }
+  
+            ctx.strokeStyle = `hsl(${(section.section * 60) % 360}, 100%, 50%)`;
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
       }
     }
     else {
