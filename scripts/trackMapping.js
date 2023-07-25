@@ -31,6 +31,12 @@ const scaleFactor = 0.30;
 let x;
 let y;
 
+/* Atrittion coefficient */
+let u = 0.86; 
+
+/* Mass in grams */
+let m = 130;
+
 /* Purely circular track */
 // const trackData = [
 //   { 
@@ -329,14 +335,33 @@ function drawTrack() {
   // ctx.stroke();
 }
 
+function confirmAttritionCoefficient() {
+  u = document.getElementById("attrition-coefficient").value;
+  drawTable();
+}
+
+function confirmMass() {
+  m = document.getElementById("mass").value;
+  drawTable();
+}
+
 function drawTable() {
+  $("table.table.table-striped.table-dark tbody").empty();
   for(const section of trackSectionInformation) {
+    if(section.isACurve) {
+      var linearVelocity = Math.sqrt((section.radius/1000) * 9.81 * u);
+      var rotationalVelocity = linearVelocity / (section.radius/1000);
+    }
+    else {
+      var linearVelocity = Math.sqrt(u * 9.81);
+      var rotationalVelocity = 0;
+    }
     var newRow = $("<tr>");
     var columns = "";
     columns += `<th scope="row">${section.section}</th>`;
     columns += `<td>${section.isACurve == true ? "curve" : "straight"}</td>`;
-    columns += `<td>${section.isACurve == true ? "VL and theta" : "MAX"}</td>`;
-    columns += `<td>${section.isACurve == true ? "VL and theta" : "0"}</td>`;
+    columns += `<td>${ linearVelocity.toFixed(2) }</td>`;
+    columns += `<td>${ rotationalVelocity.toFixed(2) }</td>`;
     columns += `<td>${section.rightEncoderCount}</td>`;
     columns += `<td>${section.leftEncoderCount}</td>`;
     columns += `<td>${section.rightTravelledDistance.toFixed(2)}</td>`;
